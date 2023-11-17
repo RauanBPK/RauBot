@@ -185,7 +185,7 @@ async def toprajogo(ctx, command=None):
         await ctx.send(f"Estamos em **{len(players_queue_5)}/5**. Bora **{insult}s!**")
 
         if len(players_queue_5) == 5:
-            await ctx.send("O time esta pronto 🌝")
+            await ctx.send("O time está pronto 🌝")
 
             await ctx.send(f"Time: {nl}{nl.join([user.mention for user in players_queue_5])}")
 
