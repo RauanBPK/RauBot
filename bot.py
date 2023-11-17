@@ -22,6 +22,12 @@ async def on_ready():
 async def hello(ctx):
     await ctx.send('Oi, cara de boi 🐮!')
 
+@bot.command(name="qualmapa", help="Sorteia um mapa para ser jogado")
+async def random_map(ctx):
+    mapas = ["Ascent", "Bind", "Icebox", "Breeze", "Sunset", "Haven", "Pearl", "Fracture", "Lotus", "Split"]
+    mapa = random.choice(mapas)
+    await ctx.send(f"O mapa sorteado foi {mapa}! 🤪")
+
 @bot.command(name='qualboneco', help="Escolha um boneco pra jogar. <role> opcional")
 async def random_char(ctx, role = None):
     try:
