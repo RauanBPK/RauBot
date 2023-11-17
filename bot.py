@@ -1,6 +1,7 @@
 import discord
 import random
 import os
+import requests
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
@@ -9,6 +10,8 @@ from utils import get_id_from_mention, nl, insults, hypes
 intents = discord.Intents.all()
 load_dotenv()
 RAUBOT_TOKEN = os.getenv('RAUBOT_TOKEN')
+DADJOKE_API_KEY = os.getenv('DADJOKE_API_KEY')
+
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
@@ -103,6 +106,16 @@ async def random_teams(ctx, *member_mentions):
     except Exception as e:
         await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
+@bot.command(name='dadjoke', help="Conta uma piadinha tosca")
+async def dad_joke(ctx):
+    api_url = "https://api.api-ninjas.com/v1/dadjokes?limit=1"
+    headers = {'Accept': 'application/json', 'X-Api-Key': DADJOKE_API_KEY}
+    res = requests.get(api_url, headers=headers)
+    if res.status_code == 200:
+        await ctx.send(res.json()[0]['joke'])
+    else:
+        await ctx.send("⚠️ Problema com a API de piadinhas... 😢")
 
 @bot.command(name='mover', help="Use !mover <canal_de_voz> @<user1> @<user2> para mover os times para outro canal de voz")
 async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
