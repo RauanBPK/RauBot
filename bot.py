@@ -95,7 +95,6 @@ async def random_teams(ctx, *member_mentions):
         team2 = member_mentions[midpoint:]
         team2 = [get_id_from_mention(member) for member in team2]
         # Display the teams
-
         await ctx.send("Times criados! 😎")
         # appends the names that resolved to a valid ID ( like in @ra1 )
         team1_names = [await bot.fetch_user(user_id) for user_id in team1 if isinstance(user_id, int)]
@@ -183,18 +182,14 @@ async def five_vs_five(ctx, command=None):
         if current_count < 10:
             await ctx.send(f"Falta{'m' if current_count < 9 else ''} {10-current_count}!")
         return
-    # Check if the user has already been added to the queue
     if ctx.author.id not in [user.id for user in players_queue]:
         players_queue.append(ctx.author)
         insult = random.choice(insults)
         await ctx.send(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
 
-        # Check if the queue is full
         if len(players_queue) == 10:
             await ctx.send("Os times estão prontos 🌝 🆚 🌚")
 
-            # Implement your team formation logic here
-            # Example team formation:
             random.shuffle(players_queue)
             team1 = players_queue[:5]
             team2 = players_queue[5:10]
@@ -202,7 +197,6 @@ async def five_vs_five(ctx, command=None):
             await ctx.send(f"Time 1: {nl}{nl.join([user.mention for user in team1])}")
             await ctx.send(f"Time 2: {nl}{nl.join([user.mention for user in team2])}")
 
-            # Clear the queue after forming teams
             players_queue = []
             vai_ganhar = random.choice([1, 2])
             insult = random.choice(insults)
