@@ -163,7 +163,7 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
 
-@bot.command(name='toprajogo', help="Forma um time de 5 players cada. !toprajogo reset para zerar! !toprajogo lista para listar")
+@bot.command(name='toprajogo', help="Forma um time de 5 players. !toprajogo reset para zerar! !toprajogo lista para listar")
 async def toprajogo(ctx, command=None):
     global players_queue_5
     if command == "reset":
