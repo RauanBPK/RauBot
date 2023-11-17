@@ -1,13 +1,14 @@
 import discord
 import random
-
-from tokens import raubot_token
+import os
+from dotenv import load_dotenv
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 from utils import get_id_from_mention, nl, insults, hypes
 
 intents = discord.Intents.all()
-
+load_dotenv()
+RAUBOT_TOKEN = os.getenv('RAUBOT_TOKEN')
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
@@ -145,4 +146,4 @@ async def on_command_error(ctx, error):
     else:
         pass
 
-bot.run(raubot_token)
+bot.run(RAUBOT_TOKEN)
