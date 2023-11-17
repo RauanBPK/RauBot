@@ -164,7 +164,7 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
 
 
 @bot.command(name='toprajogo', help="Forma um time de 5 players cada. !toprajogo reset para zerar! !toprajogo lista para listar")
-async def five_vs_five(ctx, command=None):
+async def toprajogo(ctx, command=None):
     global players_queue_5
     if command == "reset":
         players_queue_5 = []
