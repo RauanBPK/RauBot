@@ -64,15 +64,11 @@ async def random_char(ctx, role=None):
 
 @bot.command(name='qualrole', help="Escolha um role para jogar no Vavazinho")
 async def random_role(ctx):
-    try:
-        roles = ["Duelista", "Controlador", "Sentinela", "Iniciador"]
-        role = random.choice(roles)
-        insult = random.choice(insults)
-        user = ctx.message.author
-        await ctx.send(f"{user.mention} vai jogar de **{role}**! Boa sorte {insult}! 😊")
-    except Exception as e:
-        await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
-        await ctx.send(f'Log: {" ".join(list(e.args))}')
+    roles = ["Duelista", "Controlador", "Sentinela", "Iniciador"]
+    role = random.choice(roles)
+    insult = random.choice(insults)
+    user = ctx.message.author
+    await ctx.send(f"{user.mention} vai jogar de **{role}**! Boa sorte {insult}! 😊")
 
 
 @bot.command(name='times', help="Use !times @<user1> @<user2>... para formar times ")
