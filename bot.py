@@ -162,7 +162,7 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
 
-@bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar!")
+@bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar! !5v5 lista para listar")
 async def five_vs_five(ctx, command=None):
     global players_queue
     if command == "reset":
