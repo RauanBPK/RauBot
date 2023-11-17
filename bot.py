@@ -190,6 +190,7 @@ async def toprajogo(ctx, command=None):
             await ctx.send(f"Time: {nl}{nl.join([user.mention for user in players_queue_5])}")
 
             players_queue_5 = []
+            insult = random.choice(insults)
             await ctx.send(f'Boa sorte pros cinco **{insult.lower()}s**')
     else:
         insult = random.choice(insults)
