@@ -13,6 +13,7 @@ RAUBOT_TOKEN = os.getenv('RAUBOT_TOKEN')
 DADJOKE_API_KEY = os.getenv('DADJOKE_API_KEY')
 bot = commands.Bot(command_prefix='!', intents=intents)
 players_queue = []
+players_queue_5 = []
 
 
 @bot.event
@@ -160,6 +161,39 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
     except Exception as e:
         await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
+
+@bot.command(name='toprajogo', help="Forma um time de 5 players cada. !toprajogo reset para zerar! !toprajogo lista para listar")
+async def five_vs_five(ctx, command=None):
+    global players_queue_5
+    if command == "reset":
+        players_queue_5 = []
+        await ctx.send("Contador resetado 😔")
+        return
+    if command == "lista":
+        if len(players_queue_5) == 0:
+            await ctx.send("Lista vazia... q tistreza 😟")
+            return
+        await ctx.send("```LISTA:\n" + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue_5)]) + "```")
+        current_count = len(players_queue_5)
+        if current_count < 5:
+            await ctx.send(f"Falta{'m' if current_count < 4 else ''} {5-current_count}!")
+        return
+    if ctx.author.id not in [user.id for user in players_queue_5]:
+        players_queue_5.append(ctx.author)
+        insult = random.choice(insults)
+        await ctx.send(f"Estamos em **{len(players_queue_5)}/5**. Bora **{insult}s!**")
+
+        if len(players_queue_5) == 5:
+            await ctx.send("O time esta pronto 🌝")
+
+            await ctx.send(f"Time: {nl}{nl.join([user.mention for user in players_queue_5])}")
+
+            players_queue_5 = []
+            await ctx.send(f'Boa sorte pros cinco **{insult.lower()}s**')
+    else:
+        insult = random.choice(insults)
+        await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
 
 
 @bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar! !5v5 lista para listar")
