@@ -11,8 +11,8 @@ intents = discord.Intents.all()
 load_dotenv()
 RAUBOT_TOKEN = os.getenv('RAUBOT_TOKEN')
 DADJOKE_API_KEY = os.getenv('DADJOKE_API_KEY')
-
 bot = commands.Bot(command_prefix='!', intents=intents)
+players_queue = []
 
 @bot.event
 async def on_ready():
@@ -157,6 +157,55 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
     except Exception as e:
         await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user.name}')
+
+@bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar!")
+async def five_vs_five(ctx, command = None):
+    global players_queue
+    if command == "reset":
+        players_queue = []
+        await ctx.send("Contador resetado 😔")
+        return
+    if command == "lista":
+        if len(players_queue) == 0:
+            await ctx.send(f"Lista vazia... q tistreza 😟")
+            return
+        await ctx.send("```LISTA:\n" + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue)]) + "```")
+        current_count = len(players_queue)
+        if current_count < 10:
+            await ctx.send(f"Falta{'m' if current_count < 9 else ''} {10-current_count}!")
+        return
+    # Check if the user has already been added to the queue
+    if ctx.author.id not in [user.id for user in players_queue]:
+        players_queue.append(ctx.author)
+        insult = random.choice(insults)
+        await ctx.send(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
+
+        # Check if the queue is full
+        if len(players_queue) == 10:
+            await ctx.send("Os times estão prontos 🌝 🆚 🌚")
+
+            # Implement your team formation logic here
+            # Example team formation:
+            random.shuffle(players_queue)
+            team1 = players_queue[:5]
+            team2 = players_queue[5:10]
+
+            await ctx.send(f"Time 1: {nl}{nl.join([user.mention for user in team1])}")
+            await ctx.send(f"Time 2: {nl}{nl.join([user.mention for user in team2])}")
+
+            # Clear the queue after forming teams
+            players_queue = []
+            vai_ganhar = random.choice([1, 2])
+            insult = random.choice(insults)
+            hype = random.choice(hypes)
+            await ctx.send(f'Boa sorte pros **{insult.lower()}s** do Time{1 if vai_ganhar == 2 else 2}, o Time{vai_ganhar} é **muito** {hype}! 😏')
+    else:
+        insult = random.choice(insults)
+        await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
 
 @bot.event
 async def on_command_error(ctx, error):
