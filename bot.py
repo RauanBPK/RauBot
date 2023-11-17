@@ -14,13 +14,16 @@ DADJOKE_API_KEY = os.getenv('DADJOKE_API_KEY')
 bot = commands.Bot(command_prefix='!', intents=intents)
 players_queue = []
 
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name}')
 
+
 @bot.command(name='oi', help="Diga oi para RauBot!")
 async def hello(ctx):
     await ctx.send('Oi, cara de boi 🐮!')
+
 
 @bot.command(name="qualmapa", help="Sorteia um mapa para ser jogado")
 async def random_map(ctx):
@@ -28,8 +31,9 @@ async def random_map(ctx):
     mapa = random.choice(mapas)
     await ctx.send(f"O mapa sorteado foi **{mapa}**! 🤪")
 
+
 @bot.command(name='qualboneco', help="Escolha um boneco pra jogar. <role> opcional")
-async def random_char(ctx, role = None):
+async def random_char(ctx, role=None):
     try:
         agents = {
             "duelistas": ["Phoenix", "Neon", "Jett", "Raze", "Yoru", "Iso", "Reyna"],
@@ -54,8 +58,9 @@ async def random_char(ctx, role = None):
             agent = random.choice(all_agents)
             await ctx.send(f"{user.mention} vai jogar de **{agent}**! Boa sorte **{insult}** 🤗")
     except Exception as e:
-        await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
+        await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
 
 @bot.command(name='qualrole', help="Escolha um role para jogar no Vavazinho")
 async def random_role(ctx):
@@ -66,8 +71,9 @@ async def random_role(ctx):
         user = ctx.message.author
         await ctx.send(f"{user.mention} vai jogar de **{role}**! Boa sorte {insult}! 😊")
     except Exception as e:
-        await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
+        await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
 
 @bot.command(name='times', help="Use !times @<user1> @<user2>... para formar times ")
 async def random_teams(ctx, *member_mentions):
@@ -110,8 +116,9 @@ async def random_teams(ctx, *member_mentions):
         hype = random.choice(hypes)
         await ctx.send(f'Boa sorte pros **{insult.lower()}s** do Time{1 if vai_ganhar == 2 else 2}, o Time{vai_ganhar} é **muito** {hype}! 😏')
     except Exception as e:
-        await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
+        await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
+
 
 @bot.command(name='dadjoke', help="Conta uma piadinha tosca")
 async def dad_joke(ctx):
@@ -122,6 +129,7 @@ async def dad_joke(ctx):
         await ctx.send(res.json()[0]['joke'])
     else:
         await ctx.send("⚠️ Problema com a API de piadinhas... 😢")
+
 
 @bot.command(name='mover', help="Use !mover <canal_de_voz> @<user1> @<user2> para mover os times para outro canal de voz")
 async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
@@ -138,7 +146,7 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
                     try:
                         member_id = int(member_mention.replace('<@', '').replace('>', ''))  # Extract member ID from mention
                         member = ctx.guild.get_member(member_id)
-                    except ValueError as e:
+                    except ValueError:
                         await ctx.send(f"⚠️ Não consegui mover **{member_mention}** 😔")
                         continue
                     if member and member.voice:
@@ -155,15 +163,12 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
     except commands.ChannelNotFound as e:
         await ctx.send(f'☠️ERRO☠️ - Não encontrei o canal {e.argument} 😢')
     except Exception as e:
-        await ctx.send(f'☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
+        await ctx.send('☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠')
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user.name}')
 
 @bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar!")
-async def five_vs_five(ctx, command = None):
+async def five_vs_five(ctx, command=None):
     global players_queue
     if command == "reset":
         players_queue = []
@@ -171,7 +176,7 @@ async def five_vs_five(ctx, command = None):
         return
     if command == "lista":
         if len(players_queue) == 0:
-            await ctx.send(f"Lista vazia... q tistreza 😟")
+            await ctx.send("Lista vazia... q tistreza 😟")
             return
         await ctx.send("```LISTA:\n" + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue)]) + "```")
         current_count = len(players_queue)
@@ -206,6 +211,7 @@ async def five_vs_five(ctx, command = None):
     else:
         insult = random.choice(insults)
         await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
+
 
 @bot.event
 async def on_command_error(ctx, error):
