@@ -233,7 +233,7 @@ async def five_vs_five(ctx, command=None):
             await ctx.send(f"Falta{'m' if current_count < 9 else ''} {10-current_count}!")
         return
     if command == "juntar":
-        [players_queue.append(user) for user in players_queue_5]  # if user not in players_queue]
+        [players_queue.append(user) for user in players_queue_5 if user not in players_queue]
         insult = random.choice(insults)
         await ctx.send(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
         return
