@@ -295,7 +295,7 @@ async def comp_maker(ctx, command=None):
         try:
             res_json = res.json()
             if not res_json:
-                await ctx.send(f"Não encontrei nenhuma composição jogada na **{command}** nos últimos 90 dias. 😔")
+                await ctx.send(f"Não encontrei nenhuma composição pickada na **{command}** nos últimos 90 dias. 😔")
                 return
             most_picked_json = res_json[0]
             most_picked_agents = [agent['title'] for agent in most_picked_json['agents']]
@@ -303,7 +303,7 @@ async def comp_maker(ctx, command=None):
             times_played = most_picked_json['timesPlayed']
             win_rate = most_picked_json['winRate']
             wins = most_picked_json['wins']
-            await ctx.send(f"A comp mais jogada nos últimos camps na **{command}** foi:{nl}**{' - '.join(most_picked_agents)}**")
+            await ctx.send(f"A comp mais pickada nos últimos camps na **{command}** foi:{nl}**{' - '.join(most_picked_agents)}**")
             await ctx.send(f"Frequência: **{pick_rate}%**{nl}Vezes utilizada: **{times_played}**{nl}"
                            f"Taxa de vitória: **{win_rate}%**{nl}Vitórias: **{wins}**")
             insult = random.choice(insults)
