@@ -5,7 +5,7 @@ import requests
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
-from utils import get_id_from_mention, nl, insults, hypes
+from utils import get_id_from_mention, nl, insults, hypes, mapas
 
 intents = discord.Intents.all()
 load_dotenv()
@@ -28,7 +28,6 @@ async def hello(ctx):
 
 @bot.command(name="qualmapa", help="Sorteia um mapa para ser jogado")
 async def random_map(ctx):
-    mapas = ["Ascent", "Bind", "Icebox", "Breeze", "Sunset", "Haven", "Pearl", "Fracture", "Lotus", "Split"]
     mapa = random.choice(mapas)
     await ctx.send(f"O mapa sorteado foi **{mapa}**! 🤪")
 
@@ -269,6 +268,47 @@ async def five_vs_five(ctx, command=None):
     else:
         insult = random.choice(insults)
         await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
+
+
+@bot.command(name='qualcomp', help="Busca uma comp para jogar")
+async def comp_maker(ctx, command=None):
+    api_url = "https://api.thespike.gg/stats/compositions?"
+    if command is not None and not command.isalpha():
+        await ctx.send("Mano, é pra digitar o nome de um mapa, não uma equação... 😒")
+        return
+    if not command:
+        await ctx.send(f"Escolha um dos seguintes mapas:{nl}**{' - '.join(mapas)}**")
+        return
+    else:
+        command = command.capitalize()
+        if command not in mapas:
+            await ctx.send(f"Acho que esse mapa não existe... {nl}Escolha um dos seguintes mapas:{nl}**{' - '.join(mapas)}**")
+            return
+
+        map_code = mapas.index(command) + 1  # This is specific for the API that is being used
+        api_url_formatted = f"{api_url}map={map_code}"
+        res = requests.get(api_url_formatted)
+        if res.status_code != 200:
+            await ctx.send("⚠️ Problema com a API de comps... 😢")
+            return
+        try:
+            res_json = res.json()
+            if not res_json:
+                await ctx.send(f"Não encontrei nenhuma composição jogada na **{command}** nos últimos 90 dias. 😔")
+                return
+            most_picked_json = res_json[0]
+            most_picked_agents = [agent['title'] for agent in most_picked_json['agents']]
+            pick_rate = most_picked_json['pickRate']
+            times_played = most_picked_json['timesPlayed']
+            win_rate = most_picked_json['winRate']
+            wins = most_picked_json['wins']
+            await ctx.send(f"A comp mais jogada nos últimos camps na {command} foi:{nl}**{' - '.join(most_picked_agents)}**")
+            await ctx.send(f"Frequência: **{pick_rate}%**{nl}Vezes utilizada: **{times_played}**{nl}"
+                           f"Taxa de vitória: **{win_rate}%**{nl}Vitórias: **{wins}**")
+            insult = random.choice(insults)
+            await ctx.send(f"Dei até a Comp, e agora seus **{insult}s**, bora? 😝")
+        except (ValueError, KeyError):
+            await ctx.send("⚠️ Problema com a API de comps... (buguei no json) 😢")
 
 
 @bot.event
