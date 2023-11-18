@@ -264,7 +264,7 @@ async def five_vs_five(ctx, command=None):
         await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
 
 
-@bot.command(name='qualcomp', help="Busca uma comp para jogar")
+@bot.command(name='comp', help="Busca uma comp para jogar")
 async def comp_maker(ctx, command=None):
     api_url = "https://api.thespike.gg/stats/compositions?"
     if command == "random":
