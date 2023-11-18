@@ -26,13 +26,13 @@ async def hello(ctx):
     await ctx.send('Oi, cara de boi 🐮!')
 
 
-@bot.command(name="qualmapa", help="Sorteia um mapa para ser jogado")
+@bot.command(name="mapa", help="Sorteia um mapa para ser jogado")
 async def random_map(ctx):
     mapa = random.choice(mapas)
     await ctx.send(f"O mapa sorteado foi **{mapa}**! 🤪")
 
 
-@bot.command(name='qualboneco', help="Escolha um boneco pra jogar. <role> opcional")
+@bot.command(name='boneco', help="Escolha um boneco pra jogar. <role> opcional")
 async def random_char(ctx, role=None):
     try:
         user = ctx.message.author
@@ -56,7 +56,7 @@ async def random_char(ctx, role=None):
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
 
-@bot.command(name='qualrole', help="Escolha um role")
+@bot.command(name='role', help="Escolha um role")
 async def random_role(ctx):
     roles = ["Duelista", "Controlador", "Sentinela", "Iniciador"]
     role = random.choice(roles)
