@@ -166,6 +166,18 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
 @bot.command(name='toprajogo', help="Forma um time de 5 players. !toprajogo reset para zerar! !toprajogo lista para listar")
 async def toprajogo(ctx, command=None):
     global players_queue_5
+    if command == "remove":
+        if ctx.author.id in [user.id for user in players_queue_5]:
+            players_queue_5.remove(ctx.author)
+            current_count = len(players_queue_5)
+            await ctx.send(f"O {ctx.author.display_name} decidiu sair...😟")
+            await ctx.send("```LISTA:\n" + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue_5)]) + "```")
+            await ctx.send(f"Falta{'m' if current_count < 4 else ''} {5 - current_count}!")
+            return
+        else:
+            insult = random.choice(insults)
+            await ctx.send(f"Vc nem ta na lista **{insult}**")
+            return
     if command == "reset":
         players_queue_5 = []
         await ctx.send("Contador resetado 😔")
@@ -180,6 +192,9 @@ async def toprajogo(ctx, command=None):
             await ctx.send(f"Falta{'m' if current_count < 4 else ''} {5-current_count}!")
         return
     if ctx.author.id not in [user.id for user in players_queue_5]:
+        if len(players_queue_5) >= 5:
+            await ctx.send("Lista cheia... Digite **!toprajogo reset** para limpar")
+            return
         players_queue_5.append(ctx.author)
         insult = random.choice(insults)
         await ctx.send(f"Estamos em **{len(players_queue_5)}/5**. Bora **{insult}s!**")
@@ -189,7 +204,6 @@ async def toprajogo(ctx, command=None):
 
             await ctx.send(f"Time: {nl}{nl.join([user.mention for user in players_queue_5])}")
 
-            players_queue_5 = []
             insult = random.choice(insults)
             await ctx.send(f'Boa sorte pros cinco **{insult.lower()}s**')
     else:
@@ -200,6 +214,18 @@ async def toprajogo(ctx, command=None):
 @bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar! !5v5 lista para listar")
 async def five_vs_five(ctx, command=None):
     global players_queue
+    if command == "remove":
+        if ctx.author.id in [user.id for user in players_queue]:
+            players_queue.remove(ctx.author)
+            current_count = len(players_queue)
+            await ctx.send(f"O {ctx.author.display_name} decidiu sair...😟")
+            await ctx.send("```LISTA:\n" + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue)]) + "```")
+            await ctx.send(f"Falta{'m' if current_count < 10 else ''} {10 - current_count}!")
+            return
+        else:
+            insult = random.choice(insults)
+            await ctx.send(f"Vc nem ta na lista **{insult}**")
+            return
     if command == "reset":
         players_queue = []
         await ctx.send("Contador resetado 😔")
@@ -213,7 +239,15 @@ async def five_vs_five(ctx, command=None):
         if current_count < 10:
             await ctx.send(f"Falta{'m' if current_count < 9 else ''} {10-current_count}!")
         return
+    if command == "juntar":
+        [players_queue.append(user) for user in players_queue_5]  # if user not in players_queue]
+        insult = random.choice(insults)
+        await ctx.send(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
+        return
     if ctx.author.id not in [user.id for user in players_queue]:
+        if len(players_queue) >= 10:
+            await ctx.send("Lista cheia... Digite **!5v5 reset** para limpar")
+            return
         players_queue.append(ctx.author)
         insult = random.choice(insults)
         await ctx.send(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
@@ -228,7 +262,6 @@ async def five_vs_five(ctx, command=None):
             await ctx.send(f"Time 1: {nl}{nl.join([user.mention for user in team1])}")
             await ctx.send(f"Time 2: {nl}{nl.join([user.mention for user in team2])}")
 
-            players_queue = []
             vai_ganhar = random.choice([1, 2])
             insult = random.choice(insults)
             hype = random.choice(hypes)
