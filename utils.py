@@ -10,3 +10,9 @@ insults = ["Pino", "Ruim", "Horroroso", "Cone", "Bot", "Bunda mole", "Camelo", "
 hypes = ["superior", "melhor", "mais forte", "mais baludo", "mais cheiroso", "mais preparado",
          "supimpa", "brabo", "fodelástico", "mais gabaritado"]
 mapas = ["Split", "Bind", "Haven", "Ascent", "Icebox", "Breeze", "Fracture", "Pearl", "Lotus", "Sunset"]
+agents = {
+            "duelistas": ["Phoenix", "Neon", "Jett", "Raze", "Yoru", "Iso", "Reyna"],
+            "sentinelas": ["Killjoy", "Cypher", "Deadlock", "Chamber", "Sage"],
+            "controladores": ["Omen", "Brimstone", "Viper", "Astra", "Harbor"],
+            "iniciadores": ["Sova", "Fade", "Skye", "Breach", "Kay/o", "Gekko"]
+        }

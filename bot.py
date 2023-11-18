@@ -5,7 +5,7 @@ import requests
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
-from utils import get_id_from_mention, nl, insults, hypes, mapas
+from utils import get_id_from_mention, nl, insults, hypes, mapas, agents
 
 intents = discord.Intents.all()
 load_dotenv()
@@ -35,12 +35,6 @@ async def random_map(ctx):
 @bot.command(name='qualboneco', help="Escolha um boneco pra jogar. <role> opcional")
 async def random_char(ctx, role=None):
     try:
-        agents = {
-            "duelistas": ["Phoenix", "Neon", "Jett", "Raze", "Yoru", "Iso", "Reyna"],
-            "sentinelas": ["Killjoy", "Cypher", "Deadlock", "Chamber", "Sage"],
-            "controladores": ["Omen", "Brimstone", "Viper", "Astra", "Harbor"],
-            "iniciadores": ["Sova", "Fade", "Skye", "Breach", "Kay/o", "Gekko"]
-        }
         user = ctx.message.author
         insult = random.choice(insults)
         if role:
@@ -309,6 +303,14 @@ async def comp_maker(ctx, command=None):
             await ctx.send(f"Dei até a Comp, e agora seus **{insult}s**, bora? 😝")
         except (ValueError, KeyError):
             await ctx.send("⚠️ Problema com a API de comps... (buguei no json) 😢")
+
+
+@bot.command(name='randomcomp', help="Faz uma comp aleatoria")
+async def random_comp(ctx):
+    all_agents = [item for sublist in [agents[key] for key in agents.keys()] for item in sublist]
+    random_comp = random.sample(all_agents, k=5)
+    await ctx.send(f"A comp que eu fiz foi: {nl}**{' - '.join(random_comp)}**")
+    await ctx.send("Gostou? 👉👈 🥹")
 
 
 @bot.event
