@@ -267,6 +267,13 @@ async def five_vs_five(ctx, command=None):
 @bot.command(name='qualcomp', help="Busca uma comp para jogar")
 async def comp_maker(ctx, command=None):
     api_url = "https://api.thespike.gg/stats/compositions?"
+    if command == "random":
+        all_agents = [item for sublist in [agents[key] for key in agents.keys()] for item in sublist]
+        random_comp = random.sample(all_agents, k=5)
+        await ctx.send(f"A comp que eu fiz foi: {nl}**{' - '.join(random_comp)}**")
+        await ctx.send("Gostou? 👉👈 🥹")
+        return
+
     if command is not None and not command.isalpha():
         await ctx.send("Mano, é pra digitar o nome de um mapa, não uma equação... 😒")
         return
@@ -303,14 +310,6 @@ async def comp_maker(ctx, command=None):
             await ctx.send(f"Dei até a Comp, e agora seus **{insult}s**, bora? 😝")
         except (ValueError, KeyError):
             await ctx.send("⚠️ Problema com a API de comps... (buguei no json) 😢")
-
-
-@bot.command(name='randomcomp', help="Faz uma comp aleatoria")
-async def random_comp(ctx):
-    all_agents = [item for sublist in [agents[key] for key in agents.keys()] for item in sublist]
-    random_comp = random.sample(all_agents, k=5)
-    await ctx.send(f"A comp que eu fiz foi: {nl}**{' - '.join(random_comp)}**")
-    await ctx.send("Gostou? 👉👈 🥹")
 
 
 @bot.event
