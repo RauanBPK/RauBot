@@ -62,7 +62,7 @@ async def random_char(ctx, role=None):
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
 
-@bot.command(name='qualrole', help="Escolha um role para jogar no Vavazinho")
+@bot.command(name='qualrole', help="Escolha um role")
 async def random_role(ctx):
     roles = ["Duelista", "Controlador", "Sentinela", "Iniciador"]
     role = random.choice(roles)
@@ -71,7 +71,7 @@ async def random_role(ctx):
     await ctx.send(f"{user.mention} vai jogar de **{role}**! Boa sorte {insult}! 😊")
 
 
-@bot.command(name='times', help="Use !times @<user1> @<user2>... para formar times ")
+@bot.command(name='times', help="!times @<user1> @<user2>... para formar times ")
 async def random_teams(ctx, *member_mentions):
     try:
         # Check if there are enough members for teams
@@ -126,7 +126,7 @@ async def dad_joke(ctx):
         await ctx.send("⚠️ Problema com a API de piadinhas... 😢")
 
 
-@bot.command(name='mover', help="Use !mover <canal_de_voz> @<user1> @<user2> para mover os times para outro canal de voz")
+@bot.command(name='mover', help="!mover <canal_de_voz> @<user1> @<user2> para mover os times para outro canal de voz")
 async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
     try:
         # Check if the command was used in a guild
@@ -162,7 +162,7 @@ async def move_to_voice_channel(ctx, to_channel: str, *member_mentions):
         await ctx.send(f'Log: {" ".join(list(e.args))}')
 
 
-@bot.command(name='toprajogo', help="Forma um time de 5 players. !toprajogo reset para zerar! !toprajogo lista para listar")
+@bot.command(name='toprajogo', help="!toprajogo - !toprajogo reset || lista || remove")
 async def toprajogo(ctx, command=None):
     global players_queue_5
     if command == "remove":
@@ -210,7 +210,7 @@ async def toprajogo(ctx, command=None):
         await ctx.send(f"{ctx.author.mention}, você já está na lista **{insult}** 🙄")
 
 
-@bot.command(name='5v5', help="Forma dois times de 5 players cada. !5v5 reset para zerar! !5v5 lista para listar")
+@bot.command(name='5v5', help="!5v5 - !5v5 reset || lista || remove || juntar")
 async def five_vs_five(ctx, command=None):
     global players_queue
     if command == "remove":
