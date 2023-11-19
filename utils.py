@@ -16,7 +16,7 @@ insults = [
     "Camelo",
     "Despreparado",
     "Esmilinguido",
-    "Bizonho",
+    "Bisonho",
     "Jamanta",
     "Energúmeno",
     "Estrupício",
