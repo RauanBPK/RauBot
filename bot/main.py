@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 intents = discord.Intents.all()
 load_dotenv()
 RAUBOT_TOKEN = os.getenv("RAUBOT_TOKEN")
-raubot = commands.Bot(command_prefix="!", intents=intents)
+OWNER_ID = os.getenv("OWNER_ID")
+raubot = commands.Bot(command_prefix="/", intents=intents)
 initial_extensions = ["cogs.misc", "cogs.valorant_commands"]
 
 
@@ -39,6 +40,18 @@ async def on_command_error(ctx, error):
         await ctx.send("⚠️ Comando não encontrado 😔. Digite `!help` para obter a lista de comandos disponíveis.")
     else:
         pass
+
+
+@raubot.command()
+async def sync(ctx):
+    if str(ctx.author.id) == OWNER_ID:
+        guild = discord.Object(id=ctx.guild.id)
+        await ctx.send(f"syncing  to {ctx.guild}...")
+        raubot.tree.copy_global_to(guild=guild)
+        await raubot.tree.sync(guild=guild)
+        await ctx.send("done!")
+    else:
+        await ctx.response.send_message("Só o papis pode usar esse comando! 🙄")
 
 
 def run_bot() -> None:

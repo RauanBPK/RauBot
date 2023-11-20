@@ -1,9 +1,4 @@
-def get_id_from_mention(mention) -> int:
-    try:
-        return int(mention.replace("<@", "").replace(">", "").replace("&", ""))
-    except ValueError:
-        return mention
-
+import discord
 
 nl = "\n"
 insults = [
@@ -53,3 +48,5 @@ agents = {
     "controladores": ["Omen", "Brimstone", "Viper", "Astra", "Harbor"],
     "iniciadores": ["Sova", "Fade", "Skye", "Breach", "Kay/o", "Gekko"],
 }
+
+GUILDS_LIST = [discord.Object(id=1174898757377208320), discord.Object(id=912485404836528128)]
