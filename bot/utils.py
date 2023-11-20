@@ -3,7 +3,7 @@ import discord
 nl = "\n"
 insults = [
     "Pino",
-    "Ruim",
+    "Péssimo",
     "Horroroso",
     "Cone",
     "Bot",
