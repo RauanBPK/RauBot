@@ -288,7 +288,7 @@ class Valorant(commands.Cog):
         return all_options
 
     @app_commands.autocomplete(mapa=comp_autocomplete)
-    @app_commands.command(name="comp", description="!comp <mapa>")
+    @app_commands.command(name="comp", description="Sugere uma comp")
     async def comp_maker(self, ctx, mapa: str = None):
         if mapa == "random":
             all_agents = [item for sublist in [agents[key] for key in agents.keys()] for item in sublist]

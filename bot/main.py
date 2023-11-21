@@ -14,7 +14,7 @@ intents = discord.Intents.all()
 load_dotenv()
 RAUBOT_TOKEN = os.getenv("RAUBOT_TOKEN")
 OWNER_ID = os.getenv("OWNER_ID")
-raubot = commands.Bot(command_prefix="/", intents=intents)
+raubot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 initial_extensions = ["cogs.misc", "cogs.valorant_commands"]
 
 
@@ -54,6 +54,20 @@ async def on_message(message):
     if should_respond:
         await message.reply("That's what she said!")
         await message.channel.send(michael_gif)
+
+
+@raubot.command()
+async def help(ctx):
+    help_string = "```      COMANDOS RAUBOT\n"
+    cogs = ctx.bot.cogs
+    cogs_names = [cog_name for cog_name in cogs]
+    for cog_name in cogs_names:
+        command_desc_tuple = [(a.name, a.description) for a in vars(ctx.bot.cogs[cog_name])["__cog_app_commands__"]]
+        for name_desc in command_desc_tuple:
+            name, description = name_desc
+            help_string += f"/{name:.<10} -> {description:.>4}\n"
+    help_string += "```"
+    await ctx.send(help_string)
 
 
 @raubot.command()
