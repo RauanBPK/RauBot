@@ -60,7 +60,7 @@ async def on_message(message):
 
 @raubot.command()
 async def help(ctx):
-    help_string = "```       COMANDOS RAUBOT\n"
+    help_string = "```        COMANDOS RAUBOT\n"
     cogs = ctx.bot.cogs
     cogs_names = [cog_name for cog_name in cogs]
     for cog_name in cogs_names:
