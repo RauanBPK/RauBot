@@ -38,4 +38,4 @@ jobs:
 
     - name: Start or restart the bot with PM2
       run: |
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && pm2 delete -s raubot || : pm2 start /home/ec2-user/RauBot/bot/main.py --name raubot --interpreter python3 -f'
+        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && pm2 delete -s raubot || : && pm2 start /home/ec2-user/RauBot/bot/main.py --name raubot --interpreter python3 -f'
