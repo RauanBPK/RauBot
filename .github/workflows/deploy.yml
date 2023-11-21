@@ -30,6 +30,8 @@ jobs:
       run: |
         pip3 install -r requirements.txt
 
-    - name: Deploy to EC2
-      run: |
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && git pull origin main && python3.9 /home/ec2-user/RauBot/bot/main.py'
+    - name: Pull from Git
+      run: ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && git pull origin main'
+
+    - name: Run the bot
+      run: ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && python3.9 /home/ec2-user/RauBot/bot/main.py'
