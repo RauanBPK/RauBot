@@ -1,5 +1,6 @@
 import asyncio
 import os
+import random
 import sys
 import traceback
 
@@ -7,6 +8,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound, ExtensionFailed, ExtensionNotFound
 from dotenv import load_dotenv
+from utils import michael_gif
 
 intents = discord.Intents.all()
 load_dotenv()
@@ -52,6 +54,17 @@ async def sync(ctx):
         await ctx.send("done!")
     else:
         await ctx.response.send_message("Só o papis pode usar esse comando! 🙄")
+
+
+@raubot.event
+async def on_message(message):
+    if message.author == raubot.user:
+        return
+
+    should_respond = random.choices([True, False], k=1, weights=(0.01, 0.99))[0]
+    if should_respond:
+        await message.reply("That's what she said!")
+        await message.channel.send(michael_gif)
 
 
 def run_bot() -> None:
