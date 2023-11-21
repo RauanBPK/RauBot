@@ -44,6 +44,18 @@ async def on_command_error(ctx, error):
         pass
 
 
+@raubot.event
+async def on_message(message):
+    await raubot.process_commands(message)
+    if message.author == raubot.user:
+        return
+
+    should_respond = random.choices([True, False], k=1, weights=(0.01, 0.99))[0]
+    if should_respond:
+        await message.reply("That's what she said!")
+        await message.channel.send(michael_gif)
+
+
 @raubot.command()
 async def sync(ctx):
     if str(ctx.author.id) == OWNER_ID:
@@ -54,17 +66,6 @@ async def sync(ctx):
         await ctx.send("done!")
     else:
         await ctx.response.send_message("Só o papis pode usar esse comando! 🙄")
-
-
-@raubot.event
-async def on_message(message):
-    if message.author == raubot.user:
-        return
-
-    should_respond = random.choices([True, False], k=1, weights=(0.01, 0.99))[0]
-    if should_respond:
-        await message.reply("That's what she said!")
-        await message.channel.send(michael_gif)
 
 
 def run_bot() -> None:

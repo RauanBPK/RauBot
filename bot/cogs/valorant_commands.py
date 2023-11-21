@@ -4,8 +4,7 @@ from typing import List
 import requests
 from discord import app_commands
 from discord.ext import commands
-
-from bot.utils import GUILDS_LIST, agents, hypes, insults, mapas, nl
+from utils import GUILDS_LIST, agents, hypes, insults, mapas, nl
 
 players_queue = []
 players_queue_5 = []
