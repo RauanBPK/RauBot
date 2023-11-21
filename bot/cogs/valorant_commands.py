@@ -203,38 +203,6 @@ class Valorant(commands.Cog):
             insult = random.choice(insults)
             await ctx.response.send_message(f"{ctx.user.mention}, você já está na lista **{insult}** 🙄")
 
-    async def get_comp_stats(self, map_code):
-        if map_code in self.comp_cache:
-            return self.comp_cache[map_code]
-
-        api_url = f"https://api.thespike.gg/stats/compositions?map={map_code}"
-        res = requests.get(api_url)
-
-        if res.status_code != 200:
-            raise ValueError("Problema com a API de comps... 😢")
-
-        try:
-            res_json = res.json()
-            if not res_json:
-                raise ValueError("Não encontrei nenhuma composição pickada no mapa nos últimos 90 dias. 😔")
-
-            most_picked_json = res_json[0]
-            most_picked_agents = [agent["title"] for agent in most_picked_json["agents"]]
-            pick_rate = most_picked_json["pickRate"]
-            times_played = most_picked_json["timesPlayed"]
-            win_rate = most_picked_json["winRate"]
-            wins = most_picked_json["wins"]
-            insult = random.choice(insults)
-
-            result = (most_picked_agents, pick_rate, times_played, win_rate, wins, insult)
-
-            # Cache the result
-            self.comp_cache[map_code] = result
-
-            return result
-        except (ValueError, KeyError):
-            raise ValueError("Problema com a API de comps... (buguei no json) 😢")
-
     async def move_teams_autocomplete(self, ctx, current: str) -> List[app_commands.Choice[str]]:
         voice_channels = ctx.guild.voice_channels
         all_options = [
@@ -279,6 +247,42 @@ class Valorant(commands.Cog):
             await ctx.response.send_message("☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠")
             await ctx.channel.send(f'Log: {" ".join(list(e.args))}')
 
+    async def get_comp_stats(self, ctx, map_code):
+        if map_code in self.comp_cache:
+            return self.comp_cache[map_code]
+
+        api_url = f"https://api.thespike.gg/stats/compositions?map={map_code}"
+        res = requests.get(api_url)
+
+        if res.status_code != 200:
+            await ctx.response.send_message("Problema com a API de comps... 😢")
+            return
+
+        try:
+            res_json = res.json()
+            if not res_json:
+                await ctx.response.send_message(
+                    "Não encontrei nenhuma composição pickada no mapa nos últimos 90 dias. 😔"
+                )
+                return
+
+            most_picked_json = res_json[0]
+            most_picked_agents = [agent["title"] for agent in most_picked_json["agents"]]
+            pick_rate = most_picked_json["pickRate"]
+            times_played = most_picked_json["timesPlayed"]
+            win_rate = most_picked_json["winRate"]
+            wins = most_picked_json["wins"]
+            insult = random.choice(insults)
+
+            result = (most_picked_agents, pick_rate, times_played, win_rate, wins, insult)
+
+            # Cache the result
+            self.comp_cache[map_code] = result
+
+            return result
+        except (ValueError, KeyError):
+            await ctx.response.send_message("Problema com a API de comps... (buguei no json) 😢")
+
     async def comp_autocomplete(self, ctx, current: str) -> List[app_commands.Choice[str]]:
         options = mapas
         all_options = [
@@ -312,9 +316,10 @@ class Valorant(commands.Cog):
 
             map_code = mapas.index(command) + 1  # This is specific for the API that is being used
             try:
-                most_picked_agents, pick_rate, times_played, win_rate, wins, insult = await self.get_comp_stats(
-                    map_code
-                )
+                res = await self.get_comp_stats(ctx, map_code)
+                if not res:
+                    return
+                most_picked_agents, pick_rate, times_played, win_rate, wins, insult = res
 
                 await ctx.response.send_message(
                     f"A comp mais pickada nos últimos camps na **{command}** foi:{nl}**{' - '.join(most_picked_agents)}**"
@@ -323,8 +328,8 @@ class Valorant(commands.Cog):
                 )
 
                 await ctx.channel.send(f"{nl}Dei até a Comp, e agora seus **{insult}s**, bora? 😝")
-            except ValueError as e:
-                await ctx.response.send_message(str(e))
+            except ValueError:
+                await ctx.response.send_message("Problema com a API de comps... (buguei no json) 😢")
 
 
 async def setup(bot) -> None:
