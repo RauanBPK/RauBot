@@ -1,0 +1,35 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Set Up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -t rsa "${{ secrets.HOST_IP }}" >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+    - name: Install Dependencies
+      run: |
+        pip3 install -r requirements.txt
+
+    - name: Deploy to EC2
+      run: |
+        ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && git pull origin main && python3.9 /bot/main.py'
