@@ -32,4 +32,4 @@ jobs:
 
     - name: Deploy to EC2
       run: |
-        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && git pull origin main && python3.9 /bot/main.py'
+        ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ec2-user@${{ secrets.HOST_IP }} 'cd /home/ec2-user/RauBot && git pull origin main && python3.9 /home/ec2-user/RauBot/bot/main.py'
