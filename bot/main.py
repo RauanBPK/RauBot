@@ -52,7 +52,7 @@ async def on_message(message):
     if message.author == raubot.user:
         return
 
-    should_respond = random.choices([True, False], k=1, weights=(0.01, 0.99))[0]
+    should_respond = random.choices([True, False], k=1, weights=(1, 150))[0]
     if should_respond:
         await message.reply("That's what she said!")
         await message.channel.send(michael_gif)
