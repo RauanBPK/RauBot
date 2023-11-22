@@ -2,7 +2,7 @@ import random
 from typing import List
 
 import requests
-from discord import app_commands
+from discord import Member, app_commands
 from discord.ext import commands
 from utils import GUILDS_LIST, agents, hypes, insults, mapas, nl
 
@@ -67,13 +67,16 @@ class Valorant(commands.Cog):
 
     @app_commands.autocomplete(command=toprajogo_autocomplete)
     @app_commands.command(name="toprajogo", description="Adiciona seu nome na lista pra jogar")
-    async def toprajogo(self, ctx, command: str = None):
+    async def toprajogo(self, ctx, command: str = None, extra_member: Member = None):
         global players_queue_5
+        action_user = ctx.user
+        if extra_member:
+            action_user = extra_member
         if command == "remove":
-            if ctx.user.id in [user.id for user in players_queue_5]:
-                players_queue_5.remove(ctx.user)
+            if action_user.id in [user.id for user in players_queue_5]:
+                players_queue_5.remove(action_user)
                 current_count = len(players_queue_5)
-                await ctx.response.send_message(f"O {ctx.user.display_name} decidiu sair...😟")
+                await ctx.response.send_message(f"O {action_user.display_name} decidiu sair...😟")
                 await ctx.channel.send(
                     "```LISTA:\n"
                     + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue_5)])
@@ -83,7 +86,7 @@ class Valorant(commands.Cog):
                 return
             else:
                 insult = random.choice(insults)
-                await ctx.response.send_message(f"Vc nem ta na lista **{insult}**")
+                await ctx.response.send_message(f"{action_user.name} nem ta na lista **{insult}**")
                 return
         if command == "reset":
             players_queue_5 = []
@@ -103,11 +106,11 @@ class Valorant(commands.Cog):
                 await ctx.channel.send(f"Falta{'m' if current_count < 4 else ''} {5 - current_count}!")
             return
 
-        if ctx.user.id not in [user.id for user in players_queue_5]:
+        if action_user.id not in [user.id for user in players_queue_5]:
             if len(players_queue_5) >= 5:
                 await ctx.response.send_message("Lista cheia... Digite **!toprajogo reset** para limpar")
                 return
-            players_queue_5.append(ctx.user)
+            players_queue_5.append(action_user)
             insult = random.choice(insults)
             await ctx.response.send_message(f"Estamos em **{len(players_queue_5)}/5**. Bora **{insult}s!**")
 
@@ -120,7 +123,7 @@ class Valorant(commands.Cog):
                 await ctx.channel.send(f"Boa sorte pros cinco **{insult.lower()}s**")
         else:
             insult = random.choice(insults)
-            await ctx.response.send_message(f"{ctx.user.mention}, você já está na lista **{insult}** 🙄")
+            await ctx.response.send_message(f"{action_user.mention}, você já está na lista **{insult}** 🙄")
 
     async def fivevsfive_autocomplete(self, ctx, current: str) -> List[app_commands.Choice[str]]:
         options = ["reset", "lista", "remove", "juntar"]
@@ -129,14 +132,17 @@ class Valorant(commands.Cog):
         ]
 
     @app_commands.autocomplete(command=fivevsfive_autocomplete)
-    @app_commands.command(name="5v5", description="Adiciona seu nome na lista pro 5x5")
-    async def five_vs_five(self, ctx, command: str = None):
+    @app_commands.command(name="5v5", description="Adiciona seu nome na lista pro 5x5 - Forma 2 times")
+    async def five_vs_five(self, ctx, command: str = None, extra_member: Member = None):
         global players_queue
+        action_user = ctx.user
+        if extra_member:
+            action_user = extra_member
         if command == "remove":
-            if ctx.user.id in [user.id for user in players_queue]:
-                players_queue.remove(ctx.user)
+            if action_user.id in [user.id for user in players_queue]:
+                players_queue.remove(action_user)
                 current_count = len(players_queue)
-                await ctx.response.send_message(f"O {ctx.user.display_name} decidiu sair...😟")
+                await ctx.response.send_message(f"O {action_user.display_name} decidiu sair...😟")
                 await ctx.channel.send(
                     "```LISTA:\n"
                     + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(players_queue)])
@@ -146,7 +152,7 @@ class Valorant(commands.Cog):
                 return
             else:
                 insult = random.choice(insults)
-                await ctx.response.send_message(f"Vc nem ta na lista **{insult}**")
+                await ctx.response.send_message(f"{action_user.name} nem ta na lista **{insult}**")
                 return
         if command == "reset":
             players_queue = []
@@ -171,11 +177,11 @@ class Valorant(commands.Cog):
             insult = random.choice(insults)
             await ctx.response.send_message(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
             return
-        if ctx.user.id not in [user.id for user in players_queue]:
+        if action_user.id not in [user.id for user in players_queue]:
             if len(players_queue) >= 10:
                 await ctx.response.send_message("Lista cheia... Digite **!5v5 reset** para limpar")
                 return
-            players_queue.append(ctx.user)
+            players_queue.append(action_user)
             insult = random.choice(insults)
             await ctx.response.send_message(f"Estamos em **{len(players_queue)}/10**. Bora **{insult}s!**")
 
@@ -192,16 +198,22 @@ class Valorant(commands.Cog):
                 insult = random.choice(insults)
                 hype = random.choice(hypes)
 
-                await ctx.channel.send(f"Time 1: {nl}{nl.join([user.mention for user in team1])}")
-                await ctx.channel.send(f"Time 2: {nl}{nl.join([user.mention for user in team2])}")
+                await ctx.channel.send(f"Time 1 (PINOS): {nl}{nl.join([user.mention for user in team1])}")
+                await ctx.channel.send(f"Time 2 (CONES): {nl}{nl.join([user.mention for user in team2])}")
                 await ctx.channel.send(
                     f"Boa sorte pros **{insult.lower()}s**"
-                    f" do Time{1 if vai_ganhar == 2 else 2},"
-                    f" o Time{vai_ganhar} é **muito** {hype}! 😏"
+                    f" do Time {1 if vai_ganhar == 2 else 2},"
+                    f" o Time {vai_ganhar} é **muito** {hype}! 😏"
                 )
         else:
             insult = random.choice(insults)
-            await ctx.response.send_message(f"{ctx.user.mention}, você já está na lista **{insult}** 🙄")
+            await ctx.response.send_message(f"{action_user.mention}, você já está na lista **{insult}** 🙄")
+
+    async def teams_autocomplete(self, ctx, current: str) -> List[app_commands.Choice[str]]:
+        all_options = [
+            app_commands.Choice(name=team, value=team) for team in ["Pinos", "Cones"] if current.lower() in team.lower()
+        ]
+        return all_options
 
     async def move_teams_autocomplete(self, ctx, current: str) -> List[app_commands.Choice[str]]:
         voice_channels = ctx.guild.voice_channels
@@ -213,20 +225,22 @@ class Valorant(commands.Cog):
         return all_options
 
     @app_commands.autocomplete(channel=move_teams_autocomplete)
+    @app_commands.autocomplete(team=teams_autocomplete)
     @app_commands.command(name="moveteam", description="Move um time pra outro canal de voz")
     async def move_teams(self, ctx, team: str, channel: str):
-        if team == "1":
+        if team == "1" or "pinos" in team.lower():
             team_members = self.teams["1"]
-        elif team == "2":
+        elif team == "2" or "cones" in team.lower():
             team_members = self.teams["2"]
         else:
-            await ctx.response.send_message("Time inválido 😔. Digite 1 ou 2")
+            await ctx.response.send_message("Time inválido 😔. Escolha entre **1-Pinos** ou **2-Cones** ")
             return
         try:
             err = 0
-            to_channel = [voice_channel for voice_channel in ctx.guild.voice_channels if voice_channel.name == channel][
-                0
+            channels_match = [
+                voice_channel for voice_channel in ctx.guild.voice_channels if voice_channel.name == channel
             ]
+            to_channel = channels_match[0] if channels_match else None
             if not to_channel:
                 await ctx.response.send_message("Não encontrei esse canal 😢")
                 return
