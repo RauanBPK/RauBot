@@ -35,6 +35,10 @@ async def setup_hook():
 
 @raubot.event
 async def on_ready():
+    # Gambiarra
+    # Da load nos arquivos de listas assim que o bot ta pronto
+    # Isso precisa ser refatorado caso o bot seja usado em vários servidores, se naõ, mistura tudo
+    raubot.cogs["Valorant"].load_lists()
     print(f"Logged in as {raubot.user.name}")
 
 

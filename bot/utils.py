@@ -17,6 +17,8 @@ insults = [
     "Estrupício",
     "Mentecapto",
     "Lerdo",
+    "Paiaço",
+    "Mijoleto",
 ]
 hypes = [
     "superior",

@@ -7,3 +7,5 @@ __pycache__
 ENV
 venv/
 ENV/
+players_*.json
+teams.json
