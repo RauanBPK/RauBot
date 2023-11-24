@@ -38,6 +38,8 @@ async def on_ready():
     # Gambiarra
     # Da load nos arquivos de listas assim que o bot ta pronto
     # Isso precisa ser refatorado caso o bot seja usado em vários servidores, se naõ, mistura tudo
+    if not os.path.exists("bot/cogs/teams"):
+        os.makedirs("bot/cogs/teams")
     raubot.cogs["Valorant"].load_lists()
     print(f"Logged in as {raubot.user.name}")
 
@@ -64,7 +66,6 @@ async def on_message(message):
 
 @raubot.command()
 async def help(ctx):
-    await ctx.send(os.getcwd())
     help_string = "```        COMANDOS RAUBOT\n"
     cogs = ctx.bot.cogs
     cogs_names = [cog_name for cog_name in cogs]
