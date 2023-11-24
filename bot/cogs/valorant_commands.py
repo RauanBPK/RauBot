@@ -152,6 +152,20 @@ class Valorant(commands.Cog):
         insult = random.choice(insults)
         await self.force_send_message(ctx, f"Estamos em **{len(player_list)}/{list_max_size}**. Bora **{insult}s!**")
 
+    async def print_member_list(self, ctx, user_list: list, user_list_max_size: int):
+        current_count = len(user_list)
+        await self.force_send_message(
+            ctx,
+            "```LISTA:\n"
+            + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(user_list)])
+            + "```",
+        )
+        await self.force_send_message(
+            ctx,
+            f"{nl}Falta{'m' if current_count < (user_list_max_size - 1) else ''}"
+            f" {user_list_max_size - current_count}!",
+        )
+
     @app_commands.command(name="mapa", description="Sorteia um mapa para ser jogado")
     async def random_map(self, ctx):
         mapa = random.choice(mapas)
@@ -199,20 +213,6 @@ class Valorant(commands.Cog):
         return [
             app_commands.Choice(name=option, value=option) for option in options if current.lower() in option.lower()
         ]
-
-    async def print_member_list(self, ctx, user_list: list, user_list_max_size: int):
-        current_count = len(user_list)
-        await self.force_send_message(
-            ctx,
-            "```LISTA:\n"
-            + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(user_list)])
-            + "```",
-        )
-        await self.force_send_message(
-            ctx,
-            f"{nl}Falta{'m' if current_count < (user_list_max_size - 1) else ''}"
-            f" {user_list_max_size - current_count}!",
-        )
 
     @app_commands.autocomplete(command=toprajogo_autocomplete)
     @app_commands.command(name="toprajogo", description="Adiciona seu nome na lista pra jogar")
