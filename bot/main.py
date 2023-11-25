@@ -40,7 +40,7 @@ async def on_ready():
     # Isso precisa ser refatorado caso o bot seja usado em vários servidores, se naõ, mistura tudo
     if not os.path.exists("bot/cogs/teams"):
         os.makedirs("bot/cogs/teams")
-    raubot.cogs["Valorant"].load_lists()
+    raubot.cogs["Valorant"].load_lists(raubot)
     print(f"Logged in as {raubot.user.name}")
 
 

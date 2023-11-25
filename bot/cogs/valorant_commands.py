@@ -1,7 +1,9 @@
 import json
 import random
+from dataclasses import dataclass
+from datetime import datetime
 from json import JSONDecodeError
-from typing import List
+from typing import List, Optional
 
 import requests
 from discord import InteractionResponded, Member, app_commands
@@ -9,59 +11,146 @@ from discord.ext import commands
 from utils import GUILDS_LIST, agents, hypes, insults, mapas, nl
 
 
+@dataclass
+class MemberToPlay:
+    member: Member
+    time_to_play: Optional[datetime] = None
+
+    def __str__(self):
+        return str(self.to_dict())
+
+    def __post_init__(self):
+        if isinstance(self.time_to_play, str):
+            try:
+                self.time_to_play = datetime.strptime(self.time_to_play, "%H:%M")
+            except (TypeError, ValueError):
+                self.time_to_play = None
+
+    @property
+    def name_and_time(self):
+        formatted_string = f"{self.display_name}"
+        if self.time_to_play:
+            formatted_string += f" ({self.time_to_play_str})"
+        return formatted_string
+
+    @property
+    def mention_and_time(self):
+        formatted_string = f"{self.mention}"
+        if self.time_to_play:
+            formatted_string += f" ({self.time_to_play_str})"
+        return formatted_string
+
+    @property
+    def id(self):
+        return self.member.id
+
+    @property
+    def name(self):
+        return self.member.name
+
+    @property
+    def display_name(self):
+        return self.member.display_name
+
+    @property
+    def mention(self):
+        return self.member.mention
+
+    @property
+    def voice(self):
+        return self.member.voice
+
+    @property
+    def move_to(self):
+        return self.member.move_to
+
+    @property
+    def time_to_play_str(self):
+        return self.time_to_play.strftime("%H:%M") if self.time_to_play else ""
+
+    def to_dict(self):
+        return {"member": self.member.id, "time_to_play": self.time_to_play_str}
+
+    @classmethod
+    def latest_play_hour(cls, members_to_play: List["MemberToPlay"]) -> Optional[str]:
+        latest_play_hour = None
+        for member_to_play in members_to_play:
+            if member_to_play.time_to_play:
+                if not latest_play_hour or member_to_play.time_to_play > latest_play_hour:
+                    latest_play_hour = member_to_play.time_to_play
+        if latest_play_hour:
+            latest_play_hour = latest_play_hour.strftime("%H:%M")
+        return latest_play_hour
+
+    @classmethod
+    def from_dict(cls, data, ctx=None):
+        member_id = data["member"]
+        member = ctx.get_user(member_id) if ctx and member_id else None
+        try:
+            time_to_play = datetime.strptime(data["time_to_play"], "%H:%M") if data["time_to_play"] else None
+        except ValueError:
+            time_to_play = None  # Set to None in case of parsing error
+        return cls(member=member, time_to_play=time_to_play)
+
+
 class Valorant(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.comp_cache = {}
-        self.players_list = []
-        self.players_list_5 = []
+        self.players_list: List[MemberToPlay] = []
+        self.players_list_5: List[MemberToPlay] = []
         self.teams = {"1": [], "2": []}
 
-    def load_lists(self):
-        self.teams = self.load_teams()
-        self.players_list_5 = self.load_players_list_5()
-        self.players_list = self.load_players_list()
+    def load_lists(self, ctx):
+        self.teams = self.load_teams(ctx)
+        self.players_list_5 = self.load_players_list_5(ctx)
+        self.players_list = self.load_players_list(ctx)
 
-    def load_teams(self):
+    def load_teams(self, ctx):
         try:
             with open("bot/cogs/teams/teams.json", "r") as file:
                 teams_json = json.load(file)
                 teams = {
-                    "1": [self.bot.get_user(user_id) for user_id in teams_json["1"]],
-                    "2": [self.bot.get_user(user_id) for user_id in teams_json["2"]],
+                    "1": [MemberToPlay.from_dict(user, ctx=ctx) for user in teams_json["1"]],
+                    "2": [MemberToPlay.from_dict(user, ctx=ctx) for user in teams_json["2"]],
                 }
         except (FileNotFoundError, JSONDecodeError, IndexError):
             teams = {"1": [], "2": []}
         return teams
 
-    def load_players_list(self):
+    def load_players_list(self, ctx):
         try:
             with open("bot/cogs/teams/players_list.json", "r") as file:
-                players_list = [self.bot.get_user(user_id) for user_id in json.load(file)]
+                players_list = [MemberToPlay.from_dict(user, ctx=ctx) for user in json.load(file)]
         except (FileNotFoundError, JSONDecodeError):
             players_list = []
         return players_list
 
-    def load_players_list_5(self):
+    def load_players_list_5(self, ctx):
         try:
             with open("bot/cogs/teams/players_list_5.json", "r") as file:
-                players_list_5 = [self.bot.get_user(user_id) for user_id in json.load(file)]
+                players_list_5 = [MemberToPlay.from_dict(user, ctx=ctx) for user in json.load(file)]
         except (FileNotFoundError, JSONDecodeError):
             players_list_5 = []
         return players_list_5
 
     def save_teams(self):
         with open("bot/cogs/teams/teams.json", "w+") as file:
-            teams = {"1": [player.id for player in self.teams["1"]], "2": [player.id for player in self.teams["2"]]}
+            teams = {
+                "1": [player.to_dict() for player in self.teams["1"]],
+                "2": [player.to_dict() for player in self.teams["2"]],
+            }
             json.dump(teams, file)
 
     def save_players_list(self):
         with open("bot/cogs/teams/players_list.json", "w+") as file:
-            json.dump([player.id for player in self.players_list], file)
+            player_data = [player.to_dict() for player in self.players_list]
+            json.dump(player_data, file)
 
     def save_players_list_5(self):
         with open("bot/cogs/teams/players_list_5.json", "w+") as file:
-            json.dump([player.id for player in self.players_list_5], file)
+            player_data = [player.to_dict() for player in self.players_list_5]
+            json.dump(player_data, file)
 
     async def force_send_message(self, ctx, msg):
         try:
@@ -97,8 +186,8 @@ class Valorant(commands.Cog):
             if not mention:
                 await self.force_send_message(
                     ctx,
-                    f"```Time 1 (PINOS): {nl}{nl.join([user.display_name for user in self.teams['1']])}{nl}"
-                    f"{nl}Time 2 (CONES): {nl}{nl.join([user.display_name for user in self.teams['2']])}```",
+                    f"```Time 1 (PINOS): {nl}{nl.join([user.name_and_time for user in self.teams['1']])}{nl}"
+                    f"{nl}Time 2 (CONES): {nl}{nl.join([user.name_and_time for user in self.teams['2']])}```",
                 )
             else:
                 await self.force_send_message(
@@ -157,14 +246,29 @@ class Valorant(commands.Cog):
         await self.force_send_message(
             ctx,
             "```LISTA:\n"
-            + nl.join([f"{index + 1} - {user.display_name}" for index, user in enumerate(user_list)])
+            + nl.join([f"{index + 1} - {user.name_and_time}" for index, user in enumerate(user_list)])
             + "```",
         )
-        await self.force_send_message(
-            ctx,
-            f"{nl}Falta{'m' if current_count < (user_list_max_size - 1) else ''}"
-            f" {user_list_max_size - current_count}!",
-        )
+        if current_count >= user_list_max_size:
+            msg = "Times fechados!" if user_list_max_size == 10 else "Time fechado!"
+            await self.force_send_message(ctx, msg)
+        else:
+            await self.force_send_message(
+                ctx,
+                f"{nl}Falta{'m' if current_count < (user_list_max_size - 1) else ''}"
+                f" {user_list_max_size - current_count}!",
+            )
+
+    def remove_player_from_list(self, player_to_remove, player_list) -> List:
+        updated_list = [player for player in player_list if player.member != player_to_remove.member]
+        return updated_list
+
+    def valid_time_to_play_str(self, time_to_play: str):
+        try:
+            datetime.strptime(time_to_play, "%H:%M")
+        except ValueError:
+            return False
+        return True
 
     @app_commands.command(name="mapa", description="Sorteia um mapa para ser jogado")
     async def random_map(self, ctx):
@@ -216,20 +320,23 @@ class Valorant(commands.Cog):
 
     @app_commands.autocomplete(command=toprajogo_autocomplete)
     @app_commands.command(name="toprajogo", description="Adiciona seu nome na lista pra jogar")
-    async def toprajogo(self, ctx, command: str = None, extra_member: Member = None):
-        action_user = ctx.user
+    async def toprajogo(self, ctx, command: str = None, extra_member: Member = None, time_to_play: str = None):
+        if time_to_play and not self.valid_time_to_play_str(time_to_play):
+            await self.force_send_message(ctx, "Hora inválida 😟... É tipo assim ó **21:30**")
+            return
+        action_user = MemberToPlay(member=ctx.user, time_to_play=time_to_play)
         if extra_member:
-            action_user = extra_member
+            action_user.member = extra_member
         if command == "remove":
             if action_user.id in [user.id for user in self.players_list_5]:
-                self.players_list_5.remove(action_user)
+                self.players_list_5 = self.remove_player_from_list(action_user, self.players_list_5)
                 self.save_players_list_5()
                 await self.force_send_message(ctx, f"O {action_user.display_name} decidiu sair...😟")
                 await self.print_member_list(ctx, self.players_list_5, 5)
                 return
             else:
                 insult = random.choice(insults)
-                await self.force_send_message(ctx, f"{action_user.name} nem ta na lista **{insult}**")
+                await self.force_send_message(ctx, f"{action_user.display_name} nem ta na lista **{insult}**")
                 return
         if command == "reset":
             self.players_list_5 = []
@@ -249,6 +356,10 @@ class Valorant(commands.Cog):
                 return
             self.players_list_5.append(action_user)
             self.save_players_list_5()
+            if action_user.time_to_play:
+                await self.force_send_message(
+                    ctx, f"**{action_user.display_name}** quer jogar só às **{action_user.time_to_play_str}**"
+                )
             await self.msg_current_count_call_players(ctx, self.players_list_5, 5)
             if len(self.players_list_5) == 5:
                 await self.force_send_message(ctx, "O time está pronto 🌝")
@@ -257,6 +368,9 @@ class Valorant(commands.Cog):
                     ctx, f"Time: {nl}{nl.join([user.mention for user in self.players_list_5])}"
                 )
 
+                latest_play_hour = MemberToPlay.latest_play_hour(self.players_list_5)
+                if latest_play_hour:
+                    await self.force_send_message(ctx, f"Hora provável de jogo: **{latest_play_hour}**")
                 insult = random.choice(insults)
                 await self.force_send_message(ctx, f"Boa sorte pros cinco **{insult.lower()}s**")
         else:
@@ -271,10 +385,10 @@ class Valorant(commands.Cog):
 
     @app_commands.autocomplete(command=fivevsfive_autocomplete)
     @app_commands.command(name="5v5", description="Adiciona seu nome na lista pro 5x5 - Forma 2 times")
-    async def five_vs_five(self, ctx, command: str = None, extra_member: Member = None):
-        action_user = ctx.user
+    async def five_vs_five(self, ctx, command: str = None, extra_member: Member = None, time_to_play: str = None):
+        action_user = MemberToPlay(member=ctx.user, time_to_play=time_to_play)
         if extra_member:
-            action_user = extra_member
+            action_user.member = extra_member
         if command == "novostimes":
             await self.shuffle_teams()
             await self.msg_list_teams(ctx)
@@ -284,7 +398,7 @@ class Valorant(commands.Cog):
             return
         if command == "remove":
             if action_user.id in [user.id for user in self.players_list]:
-                self.players_list.remove(action_user)
+                self.players_list = self.remove_player_from_list(action_user, self.players_list)
                 self.save_players_list()
                 await self.reset_teams()
                 await self.force_send_message(ctx, f"{action_user.display_name} decidiu sair...😟")
@@ -292,7 +406,7 @@ class Valorant(commands.Cog):
                 return
             else:
                 insult = random.choice(insults)
-                await self.force_send_message(ctx, f"{action_user.name} nem ta na lista **{insult}**")
+                await self.force_send_message(ctx, f"{action_user.display_name} nem ta na lista **{insult}**")
                 return
         if command == "reset":
             self.players_list = []
@@ -317,12 +431,20 @@ class Valorant(commands.Cog):
                 return
             self.players_list.append(action_user)
             self.save_players_list()
+            if action_user.time_to_play:
+                await self.force_send_message(
+                    ctx, f"**{action_user.display_name}** quer jogar só às **{action_user.time_to_play_str}**"
+                )
             await self.msg_current_count_call_players(ctx, self.players_list, 10)
 
             if len(self.players_list) == 10:
                 await self.force_send_message(ctx, "Os times estão prontos 🌝 🆚 🌚")
                 await self.shuffle_teams()
                 await self.msg_list_teams(ctx, mention=True)
+
+                latest_play_hour = MemberToPlay.latest_play_hour(self.players_list)
+                if latest_play_hour:
+                    await self.force_send_message(ctx, f"Hora provável de jogo: **{latest_play_hour}**")
 
                 vai_ganhar = random.choice([1, 2])
                 insult = random.choice(insults)
