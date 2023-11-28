@@ -211,7 +211,7 @@ class Valorant(commands.Cog):
         res = requests.get(api_url)
 
         if res.status_code != 200:
-            await self.force_send_message(ctx, "Problema com a API de comps... 😢")
+            await self.force_send_message(ctx, "Problema com a API de comps 😢")
             return
 
         try:
@@ -237,10 +237,10 @@ class Valorant(commands.Cog):
 
             return result
         except (ValueError, KeyError):
-            await self.force_send_message(ctx, "Problema com a API de comps... (buguei no json) 😢")
+            await self.force_send_message(ctx, "Problema com a API de comps (buguei no json) 😢")
 
     async def capotei_o_corsa(self, ctx, e):
-        await self.force_send_message(ctx, "☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg...🫠")
+        await self.force_send_message(ctx, "☠️ERRO☠️ - Capotei o corsa - Chame o Ra1 pra ver oq aconteceu cmg 🫠")
         await self.force_send_message(ctx, f'Log: {" ".join(list(e.args))}')
 
     async def msg_current_count_call_players(self, ctx, player_list, list_max_size):
@@ -253,12 +253,13 @@ class Valorant(commands.Cog):
 
     async def print_member_list(self, ctx, user_list: list, user_list_max_size: int):
         current_count = len(user_list)
-        await self.force_send_message(
-            ctx,
-            "```LISTA:\n"
-            + nl.join([f"{index + 1} - {user.name_and_time}" for index, user in enumerate(user_list)])
-            + "```",
-        )
+        if current_count > 0:
+            await self.force_send_message(
+                ctx,
+                "```LISTA:\n"
+                + nl.join([f"{index + 1} - {user.name_and_time}" for index, user in enumerate(user_list)])
+                + "```",
+            )
         if current_count >= user_list_max_size:
             msg = "Times fechados!" if user_list_max_size == 10 else "Time fechado!"
             await self.force_send_message(ctx, msg)
@@ -340,7 +341,7 @@ class Valorant(commands.Cog):
     @app_commands.command(name="toprajogo", description="Adiciona seu nome na lista pra jogar")
     async def toprajogo(self, ctx, command: str = None, extra_member: Member = None, time_to_play: str = None):
         if time_to_play and not self.valid_time_to_play_str(time_to_play):
-            await self.force_send_message(ctx, "Hora inválida 😟... É tipo assim ó **21:30**")
+            await self.force_send_message(ctx, "Hora inválida 😟 É tipo assim ó **21:30**")
             return
         action_user = MemberToPlay(member=ctx.user, time_to_play=time_to_play)
         if extra_member:
@@ -349,7 +350,7 @@ class Valorant(commands.Cog):
             if action_user.id in [user.id for user in self.players_list_5]:
                 self.players_list_5 = self.remove_player_from_list(action_user, self.players_list_5)
                 self.save_players_list_5()
-                await self.force_send_message(ctx, f"O {action_user.display_name} decidiu sair...😟")
+                await self.force_send_message(ctx, f"O {action_user.display_name} decidiu sair 😟")
                 await self.print_member_list(ctx, self.players_list_5, 5)
                 return
             else:
@@ -363,14 +364,14 @@ class Valorant(commands.Cog):
             return
         if command == "lista":
             if len(self.players_list_5) == 0:
-                await self.force_send_message(ctx, "Lista vazia... q tistreza 😟")
+                await self.force_send_message(ctx, "Lista vazia, q tistreza 😟")
                 return
             await self.print_member_list(ctx, self.players_list_5, 5)
             return
 
         if action_user.id not in [user.id for user in self.players_list_5]:
             if len(self.players_list_5) >= 5:
-                await self.force_send_message(ctx, "Lista cheia... Digite **/toprajogo reset** para limpar")
+                await self.force_send_message(ctx, "Lista cheia. Digite **/toprajogo reset** para limpar")
                 return
             self.players_list_5.append(action_user)
             self.save_players_list_5()
@@ -421,7 +422,7 @@ class Valorant(commands.Cog):
                 self.players_list = self.remove_player_from_list(action_user, self.players_list)
                 self.save_players_list()
                 await self.reset_teams()
-                await self.force_send_message(ctx, f"{action_user.display_name} decidiu sair...😟")
+                await self.force_send_message(ctx, f"{action_user.display_name} decidiu sair 😟")
                 await self.print_member_list(ctx, self.players_list, 10)
                 return
             else:
@@ -436,7 +437,7 @@ class Valorant(commands.Cog):
             return
         if command == "lista":
             if len(self.players_list) == 0:
-                await self.force_send_message(ctx, "Lista vazia... q tistreza 😟")
+                await self.force_send_message(ctx, "Lista vazia, q tistreza 😟")
                 return
             await self.print_member_list(ctx, self.players_list, 10)
             return
@@ -447,7 +448,7 @@ class Valorant(commands.Cog):
             return
         if action_user.id not in [user.id for user in self.players_list]:
             if len(self.players_list) >= 10:
-                await self.force_send_message(ctx, "Lista cheia... Digite **/5v5 reset** para limpar")
+                await self.force_send_message(ctx, "Lista cheia. Digite **/5v5 reset** para limpar")
                 return
             self.players_list.append(action_user)
             self.save_players_list()
@@ -550,7 +551,7 @@ class Valorant(commands.Cog):
             await self.force_send_message(ctx, "Gostou? 👉👈 🥹")
             return
         if mapa is not None and not mapa.isalpha():
-            await self.force_send_message(ctx, "Mano, é pra digitar o nome de um mapa, não uma equação... 😒")
+            await self.force_send_message(ctx, "Mano, é pra digitar o nome de um mapa, não uma equação 😒")
             return
         if not mapa:
             await self.force_send_message(ctx, f"Escolha um dos seguintes mapas:{nl}**{' - '.join(mapas)}**")
@@ -560,7 +561,7 @@ class Valorant(commands.Cog):
             if command not in mapas:
                 await self.force_send_message(
                     ctx,
-                    f"Acho que esse mapa não existe... {nl}Escolha um dos seguintes mapas:{nl}**{' - '.join(mapas)}**",
+                    f"Acho que esse mapa não existe {nl}Escolha um dos seguintes mapas:{nl}**{' - '.join(mapas)}**",
                 )
                 return
 
@@ -581,7 +582,7 @@ class Valorant(commands.Cog):
 
                 await self.force_send_message(ctx, f"{nl}Dei até a Comp, e agora seus **{insult}s**, bora? 😝")
             except ValueError:
-                await self.force_send_message(ctx, "Problema com a API de comps... (buguei no json) 😢")
+                await self.force_send_message(ctx, "Problema com a API de comps (buguei no json) 😢")
 
 
 async def setup(bot) -> None:
