@@ -245,7 +245,7 @@ class Valorant(commands.Cog):
 
     async def msg_current_count_call_players(self, ctx, player_list, list_max_size):
         message = f"Estamos em **{len(player_list)}/{list_max_size}**."
-        should_insult = random.choices([True, False], k=1, weights=(1, 2))
+        should_insult = random.choices([True, False], k=1, weights=(1, 2))[0]
         if should_insult:
             insult = random.choice(insults)
             message += f" Bora **{insult}s!**"
