@@ -72,14 +72,12 @@ class MemberToPlay:
         return {"member": self.member.id, "time_to_play": self.time_to_play_str}
 
     @classmethod
-    def latest_play_hour(cls, members_to_play: List["MemberToPlay"]) -> Optional[str]:
+    def latest_play_hour(cls, members_to_play: List["MemberToPlay"]) -> Optional[datetime]:
         latest_play_hour = None
         for member_to_play in members_to_play:
             if member_to_play.time_to_play:
                 if not latest_play_hour or member_to_play.time_to_play > latest_play_hour:
                     latest_play_hour = member_to_play.time_to_play
-        if latest_play_hour:
-            latest_play_hour = latest_play_hour.strftime("%H:%M")
         return latest_play_hour
 
     @classmethod
@@ -105,6 +103,14 @@ class Valorant(commands.Cog):
         self.teams = self.load_teams(ctx)
         self.players_list_5 = self.load_players_list_5(ctx)
         self.players_list = self.load_players_list(ctx)
+
+    def reset_lists(self):
+        self.teams = {"1": [], "2": []}
+        self.save_teams()
+        self.players_list = []
+        self.save_players_list()
+        self.players_list_5 = []
+        self.save_players_list_5()
 
     def load_teams(self, ctx):
         try:
@@ -238,8 +244,12 @@ class Valorant(commands.Cog):
         await self.force_send_message(ctx, f'Log: {" ".join(list(e.args))}')
 
     async def msg_current_count_call_players(self, ctx, player_list, list_max_size):
-        insult = random.choice(insults)
-        await self.force_send_message(ctx, f"Estamos em **{len(player_list)}/{list_max_size}**. Bora **{insult}s!**")
+        message = f"Estamos em **{len(player_list)}/{list_max_size}**."
+        should_insult = random.choices([True, False], k=1, weights=(1, 2))
+        if should_insult:
+            insult = random.choice(insults)
+            message += f" Bora **{insult}s!**"
+        await self.force_send_message(ctx, message)
 
     async def print_member_list(self, ctx, user_list: list, user_list_max_size: int):
         current_count = len(user_list)
@@ -269,6 +279,14 @@ class Valorant(commands.Cog):
         except ValueError:
             return False
         return True
+
+    def is_time_earlier_than_now(self, target_datetime):
+        now = datetime.now()
+        # Extracting hours and minutes for comparison
+        now_time = now.hour * 60 + now.minute
+        target_time = target_datetime.hour * 60 + target_datetime.minute
+
+        return target_time < now_time
 
     @app_commands.command(name="mapa", description="Sorteia um mapa para ser jogado")
     async def random_map(self, ctx):
@@ -358,7 +376,7 @@ class Valorant(commands.Cog):
             self.save_players_list_5()
             if action_user.time_to_play:
                 await self.force_send_message(
-                    ctx, f"**{action_user.display_name}** quer jogar só às **{action_user.time_to_play_str}**"
+                    ctx, f"**{action_user.display_name}** tá pra jogo às **{action_user.time_to_play_str}**"
                 )
             await self.msg_current_count_call_players(ctx, self.players_list_5, 5)
             if len(self.players_list_5) == 5:
@@ -369,8 +387,10 @@ class Valorant(commands.Cog):
                 )
 
                 latest_play_hour = MemberToPlay.latest_play_hour(self.players_list_5)
-                if latest_play_hour:
-                    await self.force_send_message(ctx, f"Hora provável de jogo: **{latest_play_hour}**")
+                if latest_play_hour and not self.is_time_earlier_than_now(latest_play_hour):
+                    await self.force_send_message(
+                        ctx, f"Hora provável de jogo: **{latest_play_hour.strftime('%H:%M')}**"
+                    )
                 insult = random.choice(insults)
                 await self.force_send_message(ctx, f"Boa sorte pros cinco **{insult.lower()}s**")
         else:
@@ -433,7 +453,7 @@ class Valorant(commands.Cog):
             self.save_players_list()
             if action_user.time_to_play:
                 await self.force_send_message(
-                    ctx, f"**{action_user.display_name}** quer jogar só às **{action_user.time_to_play_str}**"
+                    ctx, f"**{action_user.display_name}** tá pra jogo às **{action_user.time_to_play_str}**"
                 )
             await self.msg_current_count_call_players(ctx, self.players_list, 10)
 
@@ -443,8 +463,10 @@ class Valorant(commands.Cog):
                 await self.msg_list_teams(ctx, mention=True)
 
                 latest_play_hour = MemberToPlay.latest_play_hour(self.players_list)
-                if latest_play_hour:
-                    await self.force_send_message(ctx, f"Hora provável de jogo: **{latest_play_hour}**")
+                if latest_play_hour and not self.is_time_earlier_than_now(latest_play_hour):
+                    await self.force_send_message(
+                        ctx, f"Hora provável de jogo: **{latest_play_hour.strftime('%H:%M')}**"
+                    )
 
                 vai_ganhar = random.choice([1, 2])
                 insult = random.choice(insults)

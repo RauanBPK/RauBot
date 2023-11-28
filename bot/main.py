@@ -5,9 +5,10 @@ import os
 import random
 import sys
 import traceback
+from datetime import datetime
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound, ExtensionFailed, ExtensionNotFound
 from dotenv import load_dotenv
 from utils import michael_gif
@@ -33,6 +34,15 @@ async def setup_hook():
             traceback.print_exc()
 
 
+@tasks.loop(hours=1)
+async def reset_lists_task():
+    now = datetime.now()
+    # 6am, but because the bot is hosted in US, then its like 3am for UTC-3 (Brasil)
+    # (which is good enough, since I don't need much precision here)
+    if now.hour == 6:
+        raubot.cogs["Valorant"].reset_lists()
+
+
 @raubot.event
 async def on_ready():
     # Gambiarra
@@ -41,6 +51,7 @@ async def on_ready():
     if not os.path.exists("bot/cogs/teams"):
         os.makedirs("bot/cogs/teams")
     raubot.cogs["Valorant"].load_lists(raubot)
+    reset_lists_task.start()
     print(f"Logged in as {raubot.user.name}")
 
 
