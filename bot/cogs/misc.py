@@ -3,8 +3,7 @@ import os
 import requests
 from discord import app_commands
 from discord.ext import commands
-
-from bot.utils.vars import GUILDS_LIST
+from utils.vars import GUILDS_LIST
 
 DADJOKE_API_KEY = os.getenv("DADJOKE_API_KEY")
 

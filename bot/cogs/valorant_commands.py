@@ -7,9 +7,8 @@ from typing import List
 import requests
 from discord import InteractionResponded, Member, app_commands
 from discord.ext import commands
-
-from bot.utils.member_to_play import MemberToPlay
-from bot.utils.vars import GUILDS_LIST, agents, hypes, insults, mapas, nl
+from utils.member_to_play import MemberToPlay
+from utils.vars import GUILDS_LIST, agents, hypes, insults, mapas, nl
 
 
 class Valorant(commands.Cog):
