@@ -11,7 +11,8 @@ import discord
 from discord.ext import commands, tasks
 from discord.ext.commands import CommandNotFound, ExtensionFailed, ExtensionNotFound
 from dotenv import load_dotenv
-from utils import michael_gif
+
+from bot.utils.vars import michael_gif
 
 intents = discord.Intents.all()
 load_dotenv()
