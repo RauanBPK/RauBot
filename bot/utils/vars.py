@@ -3,9 +3,9 @@ import discord
 nl = "\n"
 insults = [
     "Pino",
-    "Péssimo",
-    "Horroroso",
-    "Cone",
+    "Biriguijhonson",
+    "Calabreso",
+    "Luvo de pedreiro",
     "Bot",
     "Bunda mole",
     "Camelo",
@@ -19,6 +19,8 @@ insults = [
     "Lerdo",
     "Paiaço",
     "Mijoleto",
+    "Baracobamo",
+    "Marreco",
 ]
 hypes = [
     "superior",
