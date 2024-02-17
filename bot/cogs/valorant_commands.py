@@ -271,7 +271,7 @@ class Valorant(commands.Cog):
             if action_user.id in [user.id for user in self.players_list_5]:
                 self.players_list_5 = self.remove_player_from_list(action_user, self.players_list_5)
                 self.save_players_list_5()
-                await self.force_send_message(ctx, f"O {action_user.display_name} decidiu sair 😟")
+                await self.force_send_message(ctx, f"{action_user.display_name} decidiu sair 😟")
                 await self.print_member_list(ctx, self.players_list_5, 5)
                 return
             else:
