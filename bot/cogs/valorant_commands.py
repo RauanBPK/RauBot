@@ -4,6 +4,7 @@ from datetime import datetime
 from json import JSONDecodeError
 from typing import List
 
+import pytz
 import requests
 from discord import InteractionResponded, Member, app_commands
 from discord.ext import commands
@@ -202,7 +203,7 @@ class Valorant(commands.Cog):
         return True
 
     def is_time_earlier_than_now(self, target_datetime):
-        now = datetime.now()
+        now = datetime.now(pytz.timezone("America/Sao_Paulo"))
         # Extracting hours and minutes for comparison
         now_time = now.hour * 60 + now.minute
         target_time = target_datetime.hour * 60 + target_datetime.minute
