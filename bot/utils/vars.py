@@ -45,11 +45,12 @@ mapas = [
     "Pearl",
     "Lotus",
     "Sunset",
+    "Abyss",
 ]
 agents = {
     "duelistas": ["Phoenix", "Neon", "Jett", "Raze", "Yoru", "Iso", "Reyna"],
     "sentinelas": ["Killjoy", "Cypher", "Deadlock", "Chamber", "Sage"],
-    "controladores": ["Omen", "Brimstone", "Viper", "Astra", "Harbor"],
+    "controladores": ["Omen", "Brimstone", "Viper", "Astra", "Harbor", "Clove"],
     "iniciadores": ["Sova", "Fade", "Skye", "Breach", "Kay/o", "Gekko"],
 }
 
