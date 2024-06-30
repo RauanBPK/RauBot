@@ -14,7 +14,7 @@ class Misc(commands.Cog):
 
     @app_commands.command(name="dadjoke", description="Conta uma piadinha tosca")
     async def dad_joke(self, ctx):
-        api_url = "https://api.api-ninjas.com/v1/dadjokes?limit=1"
+        api_url = "https://api.api-ninjas.com/v1/dadjokes"
         headers = {"Accept": "application/json", "X-Api-Key": DADJOKE_API_KEY}
         res = requests.get(api_url, headers=headers)
         if res.status_code == 200:
