@@ -26,13 +26,6 @@ jobs:
         ssh-keyscan -t rsa "${{ secrets.HOST_IP }}" >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
-    - name: Install PM2
-      run: npm install pm2 -g
-
-    - name: Install Dependencies
-      run: |
-        pip3 install -r requirements.txt
-
     - name: Pull from Git
       run: ssh -i "${{ secrets.SSH_PRIVATE_KEY }}" ubuntu@${{ secrets.HOST_IP }} 'cd /home/ubuntu/RauBot && git pull origin main'
 
