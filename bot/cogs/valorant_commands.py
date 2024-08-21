@@ -328,6 +328,9 @@ class Valorant(commands.Cog):
     @app_commands.autocomplete(command=fivevsfive_autocomplete)
     @app_commands.command(name="5v5", description="Adiciona seu nome na lista pro 5x5 - Forma 2 times")
     async def five_vs_five(self, ctx, command: str = None, extra_member: Member = None, time_to_play: str = None):
+        if time_to_play and not self.valid_time_to_play_str(time_to_play):
+            await self.force_send_message(ctx, "Hora inválida 😟 É tipo assim ó **21:30**")
+            return
         action_user = MemberToPlay(member=ctx.user, time_to_play=time_to_play)
         if extra_member:
             action_user.member = extra_member
